@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation(group = "com.github.yannrichet", name = "JMathPlot", version = "1.0.1")
     testImplementation(kotlin("test"))
 }
 
