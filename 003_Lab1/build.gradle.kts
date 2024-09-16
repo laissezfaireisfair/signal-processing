@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":integrate"))
     testImplementation(kotlin("test"))
 }
 
