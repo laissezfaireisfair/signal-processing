@@ -1,4 +1,4 @@
-import and.signal.integrate
+import and.signal.integrate.integrate
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
