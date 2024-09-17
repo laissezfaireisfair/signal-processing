@@ -4,7 +4,7 @@ import and.signal.integrate.integrate
 import kotlin.math.cos
 import kotlin.math.sin
 
-data class Fourier(val a0: Double, val aAndBs: List<Pair<Double, Double>>) {
+data class Fourier(val a0: Double, val frequency: Double, val aAndBs: List<Pair<Double, Double>>) {
     companion object {
         private fun ((Double) -> Double).getA0(from: Double, period: Double) =
             2 / period * integrate(from, from + period, this)
@@ -23,17 +23,23 @@ data class Fourier(val a0: Double, val aAndBs: List<Pair<Double, Double>>) {
 
                 period <= 0.0 -> throw IllegalArgumentException("Period should be positive (has $period")
 
-                else -> Fourier(a0 = this.getA0(from, period), aAndBs = this.getAAndBs(terms, from, period, frequency))
+                else -> Fourier(
+                    a0 = this.getA0(from, period),
+                    frequency = frequency,
+                    aAndBs = this.getAAndBs(terms, from, period, frequency)
+                )
             }
     }
 
-    val terms = aAndBs.size
-
     fun approximate(arg: Double, termsRequired: Int? = null): Double = when {
-        termsRequired != null && terms < termsRequired -> throw IllegalArgumentException(
-            "Required more terms ($termsRequired) than we have coefficients ($terms)"
+        termsRequired != null && aAndBs.size < termsRequired -> throw IllegalArgumentException(
+            "Required more terms ($termsRequired) than we have coefficients (${aAndBs.size})"
         )
 
-        else -> TODO()
+        else -> (termsRequired ?: aAndBs.size).let { terms ->
+            a0 / 2 + (1..terms).sumOf { n ->
+                aAndBs[n - 1].let { (an, bn) -> an * cos(n * frequency * arg) + bn * cos(n * frequency * arg) }
+            }
+        }
     }
 }
