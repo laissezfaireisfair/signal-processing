@@ -7,7 +7,7 @@ import kotlin.math.sin
 
 data class Fourier(val a0: Double, val period: Double, val aAndBs: List<Pair<Double, Double>>)
 
-fun toFourier(terms: Int, period: Double, f: (Double) -> Double): Fourier = when {
+fun toFourier(terms: Int, period: Double, f: (Double) -> Double) = when {
     terms < 0 -> throw IllegalArgumentException(
         "Count of fourier coefficients shouldn't be negative (has $terms)"
     )
@@ -26,17 +26,12 @@ fun toFourier(terms: Int, period: Double, f: (Double) -> Double): Fourier = when
     }
 }
 
-fun Fourier.approximate(arg: Double, termsRequired: Int? = null): Double = when {
-    termsRequired != null && aAndBs.size < termsRequired -> throw IllegalArgumentException(
-        "Required more terms ($termsRequired) than we have coefficients (${aAndBs.size})"
-    )
+fun Fourier.approximate(arg: Double): Double {
+    val w = (2 * PI / period)
 
-    else -> {
-        val w = (2 * PI / period)
-        val terms = termsRequired ?: aAndBs.size
-
-        a0 / 2 + (1..terms).sumOf { n ->
-            aAndBs[n - 1].let { (an, bn) -> an * cos(n * w * arg) + bn * sin(n * w * arg) }
-        }
+    return a0 / 2 + (1..aAndBs.size).sumOf { n ->
+        aAndBs[n - 1].let { (an, bn) -> an * cos(n * w * arg) + bn * sin(n * w * arg) }
     }
 }
+
+fun Fourier.getError(f: (Double) -> Double) = { arg: Double -> f(arg) - approximate(arg) }

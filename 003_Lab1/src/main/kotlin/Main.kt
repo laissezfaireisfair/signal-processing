@@ -1,6 +1,7 @@
 package and.signal
 
 import and.signal.fourier.approximate
+import and.signal.fourier.getError
 import and.signal.fourier.toFourier
 import and.signal.integrate.discretionFrequency
 import kotlin.math.floor
@@ -26,6 +27,7 @@ fun main() {
     val panel = Plot2DPanel().apply {
         addLinePlot("Signal", Color.BLUE, args, args.map { x(it) }.toDoubleArray())
         addLinePlot("Approximation", Color.ORANGE, args, args.map { fourier.approximate(it) }.toDoubleArray())
+        addLinePlot("Error", Color.RED, args, args.map { fourier.getError { x(it) }(it) }.toDoubleArray())
     }
 
     with(JFrame("Plots")) {
