@@ -1,20 +1,23 @@
 package and.signal.integrate
 
-const val discretionFrequency = 0.01
-const val shiftFromBadBorder = 1e-6
+private const val defaultBlocksCount = 1000
 
-fun Double.discreteNext() = this + discretionFrequency
+private fun rangeToBlocks(from: Double, to: Double, blockSize: Double) =
+    generateSequence(Pair(from, from + blockSize)) { (_, right) ->
+        if (right + blockSize > to) null else Pair(right, right + blockSize)
+    }
 
-fun Double.shift() = this + shiftFromBadBorder
+/// Simpson creates trouble with undefined borders
+//private fun evalBlock(a: Double, b: Double, f: (Double) -> Double) = ((b - a) / 6) * (f(a) + 4 * f((a + b) / 2) + f(b))
+private fun evalBlock(a: Double, b: Double, f: (Double) -> Double) = (b - a) * f((a + b) / 2)
 
-fun splitRange(from: Double, to: Double) = generateSequence(Pair(from, from.discreteNext())) { (_, right) ->
-    if (right.discreteNext() > to) null else Pair(right, right.discreteNext())
-}
-
-fun evalBlock(a: Double, b: Double, f: (Double) -> Double) = ((b - a) / 6) * (f(a) + 4 * f((a + b) / 2) + f(b))
-
-fun integrate(from: Double, to: Double, func: (Double) -> Double) = when {
+fun integrate(from: Double, to: Double, blocksCount: Int = defaultBlocksCount, func: (Double) -> Double) = when {
     to < from -> throw IllegalArgumentException("Backward integration is unsupported")
-    from < to -> splitRange(from, to).sumOf { (left, right) -> evalBlock(left, right, func) }
+
+    from < to -> {
+        val blockSize = (to - from) / blocksCount
+        rangeToBlocks(from, to, blockSize).sumOf { (left, right) -> evalBlock(left, right, func) }
+    }
+
     else -> 0.0
 }

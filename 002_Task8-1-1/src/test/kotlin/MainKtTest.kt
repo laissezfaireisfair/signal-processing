@@ -6,11 +6,11 @@ import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.sin
 
-const val allowedDelta = 0.1
+const val allowedDelta = 0.01
 
 class MainKtTest {
     @Test
-    fun testId() = assertEquals(0.5, integrate(0.0, 1.0, { it }), allowedDelta)
+    fun testId() = assertEquals(0.5, integrate(0.0, 1.0) { it }, allowedDelta)
 
     @Test
     fun testSinFromZeroToPi() = assertEquals(2.0, integrate(0.0, PI) { sin(it) }, allowedDelta)
@@ -31,5 +31,5 @@ class MainKtTest {
     fun testSquare() = assertEquals(0.3333, integrate(0.0, 1.0) { it * it }, allowedDelta)
 
     @Test
-    fun testExp() = assertEquals(1.7183, integrate(0.0, 1.0, { exp(it) }), allowedDelta)
+    fun testExp() = assertEquals(1.7183, integrate(0.0, 1.0) { exp(it) }, allowedDelta)
 }

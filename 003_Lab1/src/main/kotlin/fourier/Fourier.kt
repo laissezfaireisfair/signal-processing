@@ -19,7 +19,7 @@ fun toFourier(terms: Int, period: Double, f: (Double) -> Double) = when {
         val from = -period / 2
         val to = period / 2
 
-        Fourier(a0 = 2 / period * integrate(from, to, f), period = period, aAndBs = (1..terms).map { n ->
+        Fourier(a0 = 2 / period * integrate(from, to) { f(it) }, period = period, aAndBs = (1..terms).map { n ->
             Pair(2 / period * integrate(from, to) { f(it) * cos(n * w * it) },
                 2 / period * integrate(from, to) { f(it) * sin(n * w * it) })
         })
