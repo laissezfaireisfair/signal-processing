@@ -1,37 +1,16 @@
 package and.signal
 
-import and.signal.fourier.approximate
-import and.signal.fourier.getError
-import and.signal.fourier.toFourier
+import and.signal.fourier.*
 import kotlin.math.floor
 import org.math.plot.Plot2DPanel
 import java.awt.Color
 import javax.swing.JFrame
 
-private const val from: Double = -4.0
-private const val to: Double = 4.0
-private const val terms = 20
-private const val period = 2.0
-private const val step = 0.01
-
-private fun x(t: Double) = when {
-    floor(t).toInt().rem(2).let { it == 1 || it == -1 } -> 2.0
-    else -> -2.0
-}
-
-private val args = generateSequence(from) { if (it < to) it + step else null }.toList().toDoubleArray()
-
-private fun main() {
-    val fourier = toFourier(terms, period) { x(it) }
-
-    val panel = Plot2DPanel().apply {
-        addLinePlot("Signal", Color.BLUE, args, args.map { x(it) }.toDoubleArray())
-        addLinePlot("Approximation", Color.ORANGE, args, args.map { fourier.approximate(it) }.toDoubleArray())
-        addLinePlot("Error", Color.RED, args, args.map { fourier.getError { x(it) }(it) }.toDoubleArray())
+private val options = ShowOptions(from = -4.0, to = 4.0, terms = 20, period = 2.0, step = 0.01, f = { t ->
+    when {
+        floor(t).toInt().rem(2).let { it == 1 || it == -1 } -> 2.0
+        else -> -2.0
     }
+})
 
-    with(JFrame("Plots")) {
-        contentPane = panel
-        isVisible = true
-    }
-}
+private fun main() = show(options)
