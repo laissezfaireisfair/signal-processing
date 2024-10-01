@@ -15,12 +15,12 @@ fun show(options: ShowOptions) {
 
     val panel = with(options) {
         Plot2DPanel().apply {
-            addLinePlot("Signal", Color.BLUE, args, args.map { f(it) }.toDoubleArray())
+            addLinePlot("Signal", Color.BLUE, args, args.map(f).toDoubleArray())
             addLinePlot(
                 "Approximation", Color.ORANGE, args, args.map { fourier.approximate(it) }.toDoubleArray()
             )
             addLinePlot(
-                "Error", Color.RED, args, args.map { fourier.getError { f(it) }(it) }.toDoubleArray()
+                "Error", Color.RED, args, args.map { fourier.getError(f)(it) }.toDoubleArray()
             )
         }
     }
