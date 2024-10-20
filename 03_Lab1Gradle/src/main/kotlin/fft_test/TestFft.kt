@@ -21,7 +21,7 @@ fun main() {
 
     val valuesBuffer = ListBuffer(args.map { range.func(it) })
 
-    val fourierFlow = valuesBuffer.asFlow().fft(direction = TransformType.FORWARD)
+    val fourierFlow = valuesBuffer.asFlow().fft(bufferSize = valuesBuffer.size, direction = TransformType.FORWARD)
 
     val fourier = runBlocking(context = Dispatchers.Default) { fourierFlow.toList() }
 
