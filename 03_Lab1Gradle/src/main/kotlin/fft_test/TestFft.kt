@@ -7,23 +7,29 @@ import org.apache.commons.math3.transform.TransformType
 import space.kscience.kmath.commons.transform.fft
 import space.kscience.kmath.streaming.asFlow
 import space.kscience.kmath.structures.ListBuffer
-import kotlin.math.PI
-import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.hypot
 
-private data class FunctionRange(val from: Double, val to: Double, val period: Double, val func: (Double) -> Double)
+const val partsCount = 2048
 
 fun main() {
-    val range = FunctionRange(from = 0.0, to = 2 * PI, period = 2 * PI) { cos(it) }
+    val from = 0.0
+    val to = 100.0
+    val step = (to - from) / partsCount
 
-    val step = 1e+0
+    val args = (0..<partsCount).map { from + step * it }
 
-    val args = with(range) { generateSequence(from) { if (it < to) it + step else null }.toList() }
+    val frequencies = (0..<partsCount).map { it / (to - from) }
 
-    val valuesBuffer = ListBuffer(args.map { range.func(it) })
+    val valuesBuffer = ListBuffer(args.map { sin(it) })
 
-    val fourierFlow = valuesBuffer.asFlow().fft(bufferSize = valuesBuffer.size, direction = TransformType.FORWARD)
+    val fourierFlow = valuesBuffer.asFlow().fft(bufferSize = partsCount, direction = TransformType.FORWARD)
 
     val fourier = runBlocking(context = Dispatchers.Default) { fourierFlow.toList() }
 
-    println(fourier)
+    val amplitudes = fourier.map { hypot(it.re, it.im) / partsCount }
+
+    val frequencyToAmplitudes = frequencies.zip(amplitudes)
+
+    frequencyToAmplitudes.filter { (_, a) -> a > 0.1 }.forEach { (f, a) -> println("$f $a") }
 }
