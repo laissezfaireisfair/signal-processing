@@ -6,10 +6,15 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-operator fun Complex.times(other: Complex): Complex = TODO("Not yet implemented")
+operator fun Complex.times(other: Complex) = Complex(
+    re = re * other.re - im * other.im,
+    im = re * other.im + im * other.re,
+)
 
-fun Iterable<Complex>.sum(): Complex = TODO("Not yet implemented")
+operator fun Complex.plus(other: Complex) = Complex(re + other.re, im + other.im)
 
-fun dftSlow(values: List<Double>): Complex = values.mapIndexed { i, e ->
-    e.toComplex() * Complex(re = cos(2 * PI * i / values.size), im = -sin(2 * PI * i / values.size))
-}.sum()
+fun Iterable<Complex>.sum() = fold(Complex(0.0)) { e, acc -> acc + e }
+
+fun dftSlow(values: List<Double>) = values.indices.map { k -> values.mapIndexed { i, e ->
+    Complex(e) * Complex(cos(2 * PI * k * i / values.size), -sin(2 * PI * i / values.size))
+}.sum() }
